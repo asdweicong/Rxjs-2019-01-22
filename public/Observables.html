@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Observables.html</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    // function foo() {
+    //     console.log('Hello');
+    //     return 42;
+    // }
+    //
+    // var x = foo.call(); // 等同于 foo()
+    // console.log(x);
+    // var y = foo.call(); // 等同于 foo()
+    // console.log(y);
+    //
+    //
+    // var foo = Rx.Observable.create(function (observer) {
+    //     console.log('Hello-Observable');
+    //     observer.next(42);
+    // });
+    //
+    // foo.subscribe(function (x) {
+    //     console.log(x);
+    // });
+    // foo.subscribe(function (y) {
+    //     console.log(y);
+    // });
+
+
+    var foo = Rx.Observable.create(function (observer) {
+        console.log('Hello');
+        observer.next(42);
+        observer.next(100); // “返回”另外一个值
+        observer.next(200); // 还可以再“返回”值
+    });
+
+    console.log('before');
+    foo.subscribe(function (x) {
+        console.log(x);
+    });
+    console.log('after');
+
+
+    // func.call() 意思是 "同步地给我一个值"
+    // observable.subscribe() 意思是 "给我任意数量的值，无论是同步还是异步"
+
+
+    var foo = Rx.Observable.create(function (observer) {
+        console.log('Hello-异步');
+        observer.next(42);
+        observer.next(100);
+        observer.next(200);
+        setTimeout(() => {
+            observer.next(300); // 异步执行
+        }, 1000);
+    });
+
+    console.log('before-异步');
+    foo.subscribe(function (x) {
+        console.log(x);
+    });
+    console.log('after-异步');
+</script>
+</body>
+</html>

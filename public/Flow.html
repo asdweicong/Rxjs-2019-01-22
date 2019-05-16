@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Flow.html</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    // var count = 0;
+    // var rate = 1000;
+    // var lastClick = Date.now() - rate;
+    // var button = document.querySelector('button');
+    // button.addEventListener('click', () => {
+    //     console.log("Date.now():" + Date.now());
+    //     console.log("Date.now() - lastClick:" + (Date.now() - lastClick));
+    //     console.log("lastClick:" + lastClick);
+    //     console.log("lastClick:" + rate);
+    //     if (Date.now() - lastClick >= rate) {
+    //         console.log(`Clicked ${++count} times`);
+    //         lastClick = Date.now();
+    //     }
+    // });
+
+    // 除了throttleTime ，其他流程控制操作符有 filter、delay、debounceTime、take、takeUntil、distinct、distinctUntilChanged 等等。
+    var button = document.querySelector('button');
+    Rx.Observable.fromEvent(button, 'click')
+    // .throttleTime(1000)//每一秒之后触发
+        .scan(count => count + 1, 0)
+        // .filter(count =>count % 2 == 0)//过滤帅选
+        // .delay(2000)//延迟
+        // .debounceTime(2000)//限定时间內触发取最后一个触发点
+        // .take(3)//只取第n次之前的数据
+        // .distinct()//去除重复的值。
+        // .distinctUntilChanged()//去除连续重复的值。
+        .subscribe(count => console.log(`Clicked ${count} times`));
+</script>
+</body>
+</html>

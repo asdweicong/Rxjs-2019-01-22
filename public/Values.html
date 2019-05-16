@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Values.html</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    // var count = 0;
+    // var rate = 1000;
+    // var lastClick = Date.now() - rate;
+    // var button = document.querySelector('button');
+    // button.addEventListener('click', (event) => {
+    //     if (Date.now() - lastClick >= rate) {
+    //         count += event.clientX;
+    //         console.log(count)
+    //         lastClick = Date.now();
+    //     }
+    // });
+
+    // map ，其他产生值的操作符有 pluck、pairwise、 sample 等等。
+    var button = document.querySelector('button');
+    Rx.Observable.fromEvent(button, 'click')
+        .throttleTime(1000)
+        .map(event => event.clientX)
+        .scan((count, clientX) => count + clientX, 0)
+        .subscribe(count => console.log(count));
+</script>
+</body>
+</html>

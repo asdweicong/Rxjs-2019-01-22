@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Rx再体验</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    var button = document.querySelector('button');
+    button.addEventListener('click', () => console.log('Clicked!'));
+    Rx.Observable.fromEvent(button, 'click')
+        .subscribe(() => console.log('Clicked!'));
+</script>
+</body>
+</html>

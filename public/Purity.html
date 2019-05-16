@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Purity.html</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    var button = document.querySelector('button');
+
+    // var count = 0;
+    // button.addEventListener('click', () => console.log(`Clicked ${++count} times`));
+
+    // scan 操作符的工作原理与数组的 reduce 类似。它需要一个暴露给回调函数当参数的初始值。每次回调函数运行后的返回值会作为下次回调函数运行时的参数。
+    Rx.Observable.fromEvent(button, 'click')
+        .scan(count => count + 1, 0)
+        .subscribe(count => console.log(`Clicked ${count} times`));
+</script>
+</body>
+</html>

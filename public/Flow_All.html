@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Flow.html</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    /* 本文有关filter操作的内容有：
+    bufferCount、缓存原始observable发射的值，直到达到bufferSize给定的上限
+    debounce、每次点击，且当计时器的最新值未被发射时，才从计时器发射一个值
+    debounceTime、每隔n秒，输出一个计时器的值
+    distinct、去除重复的值，输出A,B,C,b
+    distinctKey、
+    distinctUntilChanged、去除连续重复的值
+    distinctUntilKeyChanged、去除连续项中，拥有相同给予key值的value的项（有点拗口..请看例子）
+    elementAt、只发射指定位置的元素
+    filter、自定义过滤规则，符合才把该值进行发射
+    first、只输出第一个元素
+    ignoreElements、忽略所有值，一个也不发射
+    audit、audit：当另一个Observable发射值前，源Observable的值会被忽略，当另一个Observable发射值时，才从源Observable发射一个最新值，然后重复上述过程。/他们与throttle的区别是，第一个值的发射，是先等待再发射，而throttle是先发射第一个值，然后再等待。
+    auditTime、auditTime：在指定等待时间内，源Observable的值会被忽略，等待结束后，发射一个源Observable的最新值，然后重复上述过程。/他们与throttle的区别是，第一个值的发射，是先等待再发射，而throttle是先发射第一个值，然后再等待。
+    last、返回源数据集的最后一个条目
+    sample、当另一个Observable发射值时，才从源Observable数据集发射一个最新值。
+    sampleTime、每隔一定的时间间隔，发射一个源Observable数据集的最新值。
+    single、若源Observable数据集只有一个数据项，则输出该项。若多于一个数据项，则报错
+    skip、跳过源Observable数据集的n个数据，然后才发射值。
+    skipUntil、忽略源Observable开头的一系列值，直到当另一个Observable开始发射值，才会从源Observable开始发射值
+    skipWhile、忽略源Observable开头的一系列值，直到有一项符合条件，才开始从源Observable的该值开始，开始发射值。
+    take、从源Obervable的开头开始，拿到n个数据项进行发射，其余的数据项将被忽略。
+    takeLast、从源Obervable的倒数第一个向前数，拿到n个数据项并进行发射，从开头开始的的数据项将被忽略。
+    takeUntil、从源Observable数据集的第一项开始进行发射，直到另一个Observable开始发射第一个值时，源Observable停止发射值。
+    takeWhile、从源Observable数据集的第一个数据项开始发射值，直到遇到符合条件的第一个数据项后，停止源Observable数据集的发射
+    throttle、每当源Observable数据集发射一个数据项时，会等待另一个Observable发射值，在等待期间源Observable的值将被忽略并不会发射，直到另一个Observable发射了一个值时，才把源Observable的最新值进行发射
+    throttleTime、每当源Observable数据集发射一个数据项时，会等待n秒，n秒后输出源Observable的最新值。
+    原文：https://www.cnblogs.com/BestMePeng/p/rxjs_learn_filter.html
+    */
+    var name = 'bufferCount';
+
+
+    var button = document.querySelector('button');
+    var number = 0;
+    switch (name) {
+        case 'bufferCount':
+            var orders = [
+                {name: 1, value: 1},
+                {name: 2, value: 2},
+                {name: 3, value: 3},
+                {name: 4, value: 4},
+                {name: 5, value: 5},
+            ];
+            var observable = Rx.Observable.create(function (observer) {
+                for (var i = 0; i < orders.length; i++) {
+                    var value = orders[i].value;
+                    (function (i, observer) { //异步接口请求操作
+                        if (i % 2 == 0) {
+                            setTimeout(function () {
+                                number += value;
+                                console.log('click1', number);
+                                observer.next(number);
+                            }, 1000);
+                        } else {
+                            setTimeout(function () {
+                                number += value;
+                                console.log('click2', number);
+                                observer.next(number);
+                            }, 2000);
+                        }
+
+                    })(i, observer)
+                }
+            });
+            observable
+                .bufferCount(orders.length)
+                .subscribe(function (value) {
+                    Rx.Observable.of(value)
+                        .last()
+                        .subscribe(function (value) {
+                            console.log("bufferCount", value, number)
+                        })
+                });
+            break;
+        case 'debounce':
+            Rx.Observable.interval(1000)
+                .debounce(() => Rx.Observable.fromEvent(button, 'click'))
+                .subscribe(x => console.log(x));
+            break;
+        case 'debounceTime':
+            Rx.Observable.interval(1000)
+                .debounceTime(500)
+                .subscribe(x => console.log(x));
+            break;
+        case 'distinct':
+            Rx.Observable.of('A', 'B', 'C', 'A', 'b', 'B')
+                .distinct()
+                .subscribe(x => console.log(x));
+            break;
+        case 'distinctUntilChanged':
+            Rx.Observable.of('A', 'B', 'B', 'A', 'B', 'A', 'A')
+                .distinctUntilChanged()
+                .subscribe(x => console.log(x));
+            break;
+        case 'distinctUntilKeyChanged':
+            var items = [
+                {age: 4, name: 'Foo'},
+                {age: 7, name: 'Bar'},
+                {age: 8, name: 'Bar'},
+                {age: 5, name: 'Foo'},
+                {age: 6, name: 'Foo'}
+            ];
+            Rx.Observable.of(...items)
+                .distinctUntilKeyChanged('name')
+                .subscribe(x => console.log(x));
+            // 输出
+            //  { age: 4, name: 'Foo'}
+            //  { age: 7, name: 'Bar'}
+            //  { age: 5, name: 'Foo'}
+            break;
+        case 'elementAt':
+            // 下标从0开始，输出 ‘A’
+            Rx.Observable.of('A', 'B', 'B', 'A', 'B', 'A', 'A')
+                .elementAt(3)
+                .subscribe(x => console.log(x));
+            break;
+        case 'filter':
+            // 输出奇数：1,2,5,7,9,1
+            Rx.Observable.of(1, 3, 2, 5, 4, 7, 6, 9, 1)
+                .filter(x => x % 2 !== 0)
+                .subscribe(x => console.log(x));
+            break;
+        case 'first':
+            // 只输出第一个元素，输出：1
+            Rx.Observable.of(1, 3, 2, 5, 4, 7, 6, 9, 1)
+                .first()
+                .subscribe(x => console.log(x));
+            break;
+        case 'ignoreElements':
+            // 啥也不输出
+            Rx.Observable.of(1, 3, 2, 5, 4, 7, 6, 9, 1)
+                .ignoreElements()
+                .subscribe(x => console.log(x));
+            break;
+        case 'auditTime':
+            // auditTime
+            // 输出2,5,8,11,13...
+            Rx.Observable.interval(1000)
+                .auditTime(2000)
+                .subscribe(x => console.log(x));
+            break;
+        case 'last':
+            // 返回最后一个条目，输出：5
+            Rx.Observable.of(1, 2, 3, 4, 5)
+                .last()
+                .subscribe(x => console.log(x));
+            break;
+        case 'sample':
+            // 每次点击输出一个计时器的最新值
+            Rx.Observable.interval(1000)
+                .sample(Rx.Observable.fromEvent(document, 'click'))
+                .subscribe(x => console.log(x));
+            break;
+        case 'sampleTime':
+            // 每隔2秒，分别输出 0,2,4,6,8....
+            Rx.Observable.interval(1000)
+                .sampleTime(2000)
+                .subscribe(x => console.log(x));
+            break;
+        case 'single':
+            // 输出 1
+            Rx.Observable.of(1)
+                .single()
+                .subscribe(x => console.log(x));
+            break;
+        case 'skip':
+            // 跳过开头2个，输出3,4
+            Rx.Observable.of(1, 2, 3, 4)
+                .skip(2)
+                .subscribe(x => console.log(x));
+            break;
+        case 'skipUntil':
+            // 3秒后，才每秒发射计时器的值，输出：2,3,4,5,6.....
+            Rx.Observable.interval(1000)
+                .skipUntil(Rx.Observable.of(1).delay(3000))
+                .subscribe(x => console.log(x));
+            break;
+        case 'skipWhile':
+            // 输出4,5,3,2,1
+            Rx.Observable.of(1, 2, 3, 4, 5, 3, 2, 1)
+                .skipWhile(x => x < 4)
+                .subscribe(x => console.log(x));
+            break;
+        case 'take':
+            // 每秒输出：0,1,2 后结束
+            Rx.Observable.interval(1000)
+                .take(3)
+                .subscribe(x => console.log(x));
+            break;
+        case 'takeLast':
+            // 输出5,6,7
+            Rx.Observable.of(1, 2, 3, 4, 5, 6, 7)
+                .takeLast(3)
+                .subscribe(x => console.log(x));
+            break;
+        case 'takeUntil':
+            // 3秒后停止计时器的值输出
+            Rx.Observable.interval(1000)
+                .takeUntil(Rx.Observable.of(1).delay(3000))
+                .subscribe(x => console.log(x));
+            break;
+        case 'takeWhile':
+            // 输出：1,2,3
+            Rx.Observable.of(1, 2, 3, 4, 3, 2, 1)
+                .takeWhile(x => x < 4)
+                .subscribe(x => console.log(x))
+            break;
+        case 'throttle':
+            // 输出0,3,6,9,12.....
+            // 每次输出一个值，至少等待两秒后，才输出最新值
+            Rx.Observable.interval(1000)
+                .throttle(x => Rx.Observable.interval(2000))
+                .subscribe(x => console.log(x));
+            break;
+        case 'throttleTime':
+            // 输出0,3,6,9,12.....
+            Rx.Observable.interval(1000)
+                .throttleTime(2000)
+                .subscribe(x => console.log(x))
+            break;
+        default:
+            break;
+    }
+
+</script>
+</body>
+</html>

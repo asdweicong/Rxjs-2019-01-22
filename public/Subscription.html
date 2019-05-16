@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Subscription.html</title>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdn.bootcss.com/rxjs/6.0.0-alpha.3/Rx.min.js"></script>
+</head>
+<body>
+<button id="addBtn">add</button>
+<script>
+    // var observable = Rx.Observable.interval(1000);
+    // var subscription = observable.subscribe(x => console.log(x));
+    // // 稍后：
+    // // 这会取消正在进行中的 Observable 执行
+    // // Observable 执行是通过使用观察者调用 subscribe 方法启动的
+    // subscription.unsubscribe();
+
+    var observable1 = Rx.Observable.interval(400);
+    var observable2 = Rx.Observable.interval(300);
+
+    var subscription = observable1.subscribe(x => console.log('first: ' + x));
+    var childSubscription = observable2.subscribe(x => console.log('second: ' + x));
+
+    subscription.add(childSubscription);
+
+    setTimeout(() => {
+        // subscription 和 childSubscription 都会取消订阅
+        subscription.unsubscribe();
+    }, 1000);
+</script>
+</body>
+</html>
